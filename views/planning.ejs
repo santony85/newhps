@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<% include head %>
+
+<style>
+	.form-group {
+		font-size: 1.1rem;
+	}
+</style>
+
+<body>
+
+	<div class="wrapper">
+
+		<% include navbar %>
+		
+		<!-- Page Content  -->
+		<div id="content">
+
+			<div class="row">
+				<div class="col-2">
+					 
+					 <% if(iduser !== "0") {%>
+					  <button type="button" class="btn btn-primary newbt mbtnew" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 5px;">
+						 Nouveau rdv
+					 </button>
+					 <% }%>
+				  </div>
+				<div class="col-10">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Planning</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-6">
+					com 1
+					<% if(user.iscdv == 1) {%>
+					<select id="userId" class="form-control" name="userId" data-source="/listcollabcdv/<%= user._id%>" data-valueKey="id" data-displayKey="text" placeholder="Commercial 1" ></select>
+					<% } else {%>
+					<select id="userId" class="form-control" name="userId" data-source="/listcollab" data-valueKey="id" data-displayKey="text" placeholder="Commercial 1" ></select>
+					<% }%>
+					<br>
+				</div>
+				<div class="col-6">
+					com 2
+					<% if(user.iscdv == 1) {%>
+					<select id="userId2" class="form-control" name="userId2" data-source="/listcollabcdv/<%= user._id%>" data-valueKey="id" data-displayKey="text"  placeholder="Commercial 2"></select>
+					<% } else {%>
+					<select id="userId2" class="form-control" name="userId" data-source="/listcollab" data-valueKey="id" data-displayKey="text" placeholder="Commercial 2" ></select>
+					<% }%>
+					<br>
+				</div>
+
+			</div>
+
+			<div class="row" style="height: 100%;">
+				<iframe id="inlineFrameExample" style='width:100%; height:90%' src="/calendarframe/<%=iduser%>/<%=nomcli%>/<%=iduser2%>/<%=nomcli2%>/rdv"></iframe>
+			</div>
+
+		</div>
+
+	</div>
+
+
+
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+		<div class="modal-content">
+		
+		  <form action="/addobj/newhpsrdv" method="POST" id="myform" name="myform"> 
+			  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalCenterTitle">Nouveau RDV</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+			  <div class="modal-body">
+			   <input type="text" class="d-none" name="_id" id="_id">
+			   
+			   <div class="row">
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Date:</label>
+							  <input type="date"  class="form-control"  id="dateRdv"  name="dateRdv0" required="true" onchange="changeDate()">
+							  <input type="text" class="d-none" name="dateRdv" id="dateRdvO" value="">
+							</div>
+					</div>
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Heure:</label>
+							  <input type="time" min="08:00" max="18:00" value="08:00"  class="form-control" name="heureRDV" id="heureRDV" required="true"  onchange='isRdvEnable("<%= iduser %>")'>
+							</div>
+					</div>
+			   </div>
+	         <div class="row">
+				 
+				 <div class="col-2">
+					 <div class="form-group">
+					   <label for="nom">Genre:</label>
+					   <select class="custom-select" required="true" name="source">
+					      <option value="Mr" selected>Mme</option>
+						  <option value="Mme">Mr</option>
+						  <option value="MrMme">Mme / Mr</option>
+						</select>
+					 </div>
+				  </div>
+				 
+				
+
+					 
+				 <div class="col-5">
+			        <div class="form-group">
+				      <label for="nom">Nom:</label>
+				      <input type="text" class="form-control" placeholder="Entrer le nom" name="nom" id="nom" required="true">
+			        </div>
+			     </div>
+			     <div class="col-5">	 
+			       <div class="form-group">
+				     <label for="pwd">Prenom</label>
+				     <input type="text" class="form-control" placeholder="Entrer le prenom" id="prenom" name="prenom" required="true">
+			        </div>
+			     </div>
+			 </div>	 
+			 
+			 <div class="form-group">
+				 <label for="label">Adresse:</label>
+	
+					   <input type="text" class="advancedAutoComplete form-control term" autocomplete="anyrandomstring" placeholder="Entrer l'adresse" name="adresse" id="label" required="true">
+					   <input type="text" class="d-none" name="lat" id="lat">
+					   <input type="text" class="d-none" name="long" id="long">
+					   
+					 <input type="text" class="d-none" name="cp" id="cp">
+					 <input type="text" class="d-none" name="ville" id="ville">
+					 <input type="text" class="d-none" name="num" id="num">
+					 <input type="text" class="d-none" name="rue" id="rue">
+					 
+					 
+					 <input type="text" class="d-none" name="idadr" id="idadr">
+	
+					 <code class="basicAutoSelectSelected"></code>
+					   
+					   
+					    <input type="text" class="d-none" name="idtel" id="idtel" value="<%= user._id %>">
+						<input type="text" class="d-none" name="nomtel" id="nomtel"  value="<%= user.nom %>">
+						<input type="text" class="d-none" name="idcomhps1" id="idcomhps1"  value="<%=iduser%>">
+						<input type="text" class="d-none" name="nomcomhps1" id="nomcomhps1"  value="<%=nomcli%> ">
+						
+						<input type="text" class="d-none" name="idcomhps2" id="idcomhps2"  value="<%=iduser2%>">
+						<input type="text" class="d-none" name="nomcomhps2" id="nomcomhps2"  value="<%=nomcli2%>">
+						
+					    <input type="text" class="d-none" name="issue" id="issue"  value="">
+						<input type="text" class="d-none" name="origine" id="origine"  value="rdv">
+						<input type="text" class="d-none" name="status" id="status"  value="rdv">
+						<input type="text" class="d-none" name="issuerdv" id="issuerdv"  value="CONFIRME">
+					    <input type="text" class="d-none" name="aff" id="aff"  value="2">
+					   
+					     
+				 
+			 </div>
+	  
+	  <div class="row">
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="tel">Telephone:</label>
+				 <input type="number" class="form-control" placeholder="Entrer le telephone" id="tel" name="tel" required="true">
+			 </div>
+		   </div>
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="email">Email address:</label>
+				 <input type="email" class="form-control" placeholder="Entrer l'email" id="email" name="email" >
+			 </div>
+		   </div>
+	  </div>
+	  
+	  <div class="row">
+			 <div class="col-3">
+			   <div class="form-group">
+				   <label for="tel">Age Mr:</label>
+				   <input type="number" class="form-control" placeholder="Entrer age Mr" id="tranchemr" name="tranchemr" >
+			   </div>
+			 </div>
+			 <div class="col-3">
+					<div class="form-group">
+						<label for="tel">Age Mme:</label>
+						<input type="number" class="form-control" placeholder="Entrer age Mme" id="tranchemme" name="tranchemme">
+					</div>
+				  </div>
+				  
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Année const. :</label>
+					   <input type="number" class="form-control" placeholder="Entrer année const." id="anneeConstr" name="anneeConstr" required="true">
+				   </div>
+				 </div>
+				 
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Nb Occupants:</label>
+					   <input type="number" class="form-control" placeholder="Entrer nb occupants" id="nboccupants" name="nboccupants" required="true">
+				   </div>
+				 </div>
+			 
+
+		</div>
+		  
+	  
+			 <div class="form-group">
+				 <label for="comTele">Commentaire:</label>
+				 <textarea class="form-control" placeholder="Entrer le commentaire" id="comTele" name="comTele" rows="4"></textarea>
+			 </div>
+			 
+
+			 
+			 
+	
+		  </div>
+			  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+			  <button type="submit" class="btn btn-primary" >Envoyer</button>
+		  </div>
+		  </form>
+		  
+		</div>
+	  </div>
+	</div>
+	
+	
+
+	<% include bsjs %>
+
+
+
+	<script type="text/javascript">
+	    var selid1=0,selnom1="";
+		
+		function changeDate(){
+			document.getElementById("dateRdvO").value = document.getElementById("dateRdv").value+"T13:00:00.000+01:00";
+			isRdvEnable("<%= iduser %>");
+		}
+	
+		$(document).ready(function() {
+			
+			$('#planning').addClass("active");
+			
+			$('#userId').each(function() {
+				var $select = $(this);
+				$select.append('<option value="0"></option>');
+				var i = 0;
+				$.ajax({
+					url: $select.attr('data-source'),
+				}).then(function(options) {
+					options.map(function(option) {
+						var $option = $('<option>');
+						$option
+							.val(option[$select.attr('data-valueKey')])
+							.text(option[$select.attr('data-displayKey')]);
+						if ($option.val() == "<%=iduser%>") $option.prop("selected", "selected");
+						$select.append($option);
+					});
+				});
+			});
+			
+			$('#userId').on('change', function(data) {
+				selid1=$(this).val() ;
+				var selectedText = $("#userId option:selected").html();
+				selnom1=selectedText
+				window.location.href = '/planning/' + $(this).val() + '/' + selectedText+'/0/0';
+			});
+			
+			$('#userId2').each(function() {
+				var $select = $(this);
+				$select.append('<option value="0"></option>');
+				var i = 0;
+				$.ajax({
+					url: $select.attr('data-source'),
+				}).then(function(options) {
+					options.map(function(option) {
+						var $option = $('<option>');
+						$option
+							.val(option[$select.attr('data-valueKey')])
+							.text(option[$select.attr('data-displayKey')]);
+						if ($option.val() == "<%=iduser2%>") $option.prop("selected", "selected");	
+						$select.append($option);
+					});
+				});
+			});
+			
+			$('#userId2').on('change', function(data) {
+				var selectedText = $("#userId2 option:selected").html();
+				if(selectedText !== "")window.location.href = '/planning/' + "<%= iduser %>/"+"<%= nomcli %>/"+$(this).val()+ '/' +selectedText;
+				else window.location.href = '/planning/' + "<%= iduser %>/"+"<%= nomcli %>/0/0";
+			});
+			
+			
+			// Advanced 1
+			$('.advancedAutoComplete').autoComplete({
+					resolver: 'custom',
+					events: {
+						search: function (qry, callback) {
+							// let's do a custom ajax call
+							var adr = document.getElementById("label").value;
+							var mdata=[];
+							$.ajax(
+								//'file.json',
+								"https://api-adresse.data.gouv.fr/search/?q="+adr+"&autocomplete=1"
+							).done(function (res) {
+								res.features.forEach(function(item){
+									console.log(item)
+									mdata.push({id: item.properties.id, text: item.properties.label,value : item });
+								})	
+					
+								callback(mdata)
+							});
+						}
+					}
+				});
+			$('.advancedAutoComplete').on('autocomplete.select', function (evt, item) {
+					console.log('select');
+					console.log(item)
+					var lat = item.value.geometry.coordinates[1];
+					var long = item.value.geometry.coordinates[0];
+					$('#lat').val(lat);
+					$('#long').val(long);
+					$('#idadr').val(item.id);
+					$('#num').val(item.value.properties.housenumber);
+					$('#rue').val(item.value.properties.street);
+					$('#cp').val(item.value.properties.postcode);
+					$('#ville').val(item.value.properties.city);
+					
+					$('.basicAutoSelectSelected').html(JSON.stringify(item.value.geometry));
+				});
+
+		});
+	</script>
+</body>
+
+</html>

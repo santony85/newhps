@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<% include head %>
+
+
+<body>
+
+    <div class="wrapper">
+		
+		<% include navbar %>
+
+        <!-- Page Content  -->
+        <div id="content">
+        
+        <div class="row">
+       	  <div class="col-2">
+		  	<button type="button" class="btn btn-primary newbt mbtnew" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 5px;">
+				 Nouveau rdv
+			 </button>
+		  </div>
+          <div class="col-10">
+          <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Clients</li>
+			</ol>
+		  </nav>
+		  </div>
+		</div>
+		
+		<table data-toggle="table"
+		 	class="table table-condensed table-striped table-sm"
+            data-url="/list/clients/<%=idclient%>"
+            data-pagination="true" 
+            data-search="true"
+            data-show-columns="true"
+            data-page-size="100"
+            id= "mtable"
+            data-page-list="[100, 200, 500, 1000]">
+            
+			<thead>
+				<tr>
+                  
+
+                                <th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+
+                                <th data-field="nom"    data-valign="middle" data-formatter="genericFm">Nom</th>
+                                <th data-field="prenom"    data-valign="middle" data-formatter="genericFm">Prenom</th>
+                                <th data-field="label" data-valign="middle" data-formatter="genericFm">Adresse</th>
+                                <th data-field="tel" 	data-valign="middle" data-formatter="genericFm">Tel.</th>
+                                <th data-field="email"  data-valign="middle" data-formatter="genericFm">Email</th>
+                                <th data-field="lat" class="d-none"	data-valign="middle" data-formatter="genericFm" >Tel.</th>
+                                <th data-field="lng" class="d-none" data-valign="middle" data-formatter="genericFm">Email</th>
+								<th data-field="num" class="d-none"	data-valign="middle" data-formatter="genericFm" >Tel.</th>
+								<th data-field="rue" class="d-none" data-valign="middle" data-formatter="genericFm">Email</th>
+								<th data-field="cp" class="d-none"	data-valign="middle" data-formatter="genericFm" >Tel.</th>
+								<th data-field="ville" class="d-none" data-valign="middle" data-formatter="genericFm">Email</th>
+								<th data-field="idadr" class="d-none" data-valign="middle" data-formatter="genericFm">Email</th>
+                                <th data-width="150px" data-field="_id"    data-valign="middle" data-formatter="delFm">Action</th>
+				</tr>
+			</thead>
+
+    </table>
+
+		</div>
+		<!-- /Page Content  -->
+		
+		
+    </div>
+    <!-- /wrapper  -->
+    
+    <!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+    
+      <form action="/addobj/clients" method="POST" id="myform"> 
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+      	 <input type="text" class="d-none" name="_id" id="_id">
+
+
+      	<div class="row">
+		 <div class="col-6">		  
+         <div class="form-group">
+		 	<label for="nom">Nom:</label>
+		 	<input type="text" class="form-control" placeholder="Entrer le nom" name="nom" id="nom" required>
+		 </div>
+		 </div>	
+		 <div class="col-6">
+		 <div class="form-group">
+		 	<label for="pwd">Prenom</label>
+		 	<input type="text" class="form-control" placeholder="Entrer le prenom" id="prenom" name="prenom" required>
+		 </div>
+		 </div>
+		 <div class="col-12">
+		 <div class="form-group">
+		 	<label for="label">Adresse:</label>
+
+		 	  	<input type="text" class="advancedAutoComplete form-control term" autocomplete="anyrandomstring" placeholder="Entrer l'adresse" name="label" id="label" required>
+		 	  	<input type="text" class="d-none" name="lat" id="lat">
+		 	  	<input type="text" class="d-none" name="lng" id="lng">
+			 	<input type="text" class="d-none" name="cp" id="cp">
+			    <input type="text" class="d-none" name="ville" id="ville">
+			 	<input type="text" class="d-none" name="num" id="num">
+			 	<input type="text" class="d-none" name="rue" id="rue">
+			    <input type="text" class="d-none" name="idadr" id="idadr">
+
+		 	  	<code class="basicAutoSelectSelected"></code>
+		 	
+		 </div>
+		 </div>
+		 <div class="col-6">
+		 <div class="form-group">
+		 	<label for="tel">Telephone:</label>
+		 	<input type="number" class="form-control" placeholder="Entrer le telephone" id="tel" name="tel" required>
+		 </div>
+         </div>
+		 <div class="col-6">
+		 <div class="form-group">
+		 	<label for="email">Email address:</label>
+		 	<input type="email" class="form-control" placeholder="Entrer l'email" id="email" name="email" >
+		 </div>
+		 </div>
+		 <div class="col-12">
+		 <div class="form-group">
+		 	<label for="commentaire">Commentaire:</label>
+		 	<textarea class="form-control" placeholder="Entrer le commentaire" id="commentaire" name="commentaire" rows="4"></textarea>
+		 </div>
+		 </div>
+		 <div class="col-6">
+		 <div class="form-group">
+		 	<label for="commercial">Commercial:</label>
+		  <select
+		  	id="userId"
+		  	class="form-control"
+		  	name="commercial"
+		  	data-source="/listcollab/<%=idclient%>/com"
+		  	data-valueKey="id"
+		  	data-displayKey="text">
+		  </select>
+		 </div>
+		 </div>
+		</div>
+		 
+
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" >Envoyer</button>
+      </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+    <!-- Modal -->
+<div class="modal fade" id="qrcodeModal" tabindex="-1" role="dialog" aria-labelledby="qrcodeModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title">QRcode</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+
+	  			 <div class="form-group">
+		 	<label for="commercial">Commercial:</label>
+		  <select
+		  	id="userIdQ"
+		  	class="form-control"
+		  	name="commercial"
+		  	data-source="/listcollab/<%=idclient%>"
+		  	data-valueKey="id"
+		  	data-displayKey="text">
+		  </select>
+		 </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+         <button type="submit" class="btn btn-primary" >Nouveau RDV</button>
+      </div>
+      
+      
+    </div>
+  </div>  
+</div>
+    
+	<% include bsjs %>
+	
+
+	<script>
+
+	
+    
+        function genericFm(value, row, index,field) {
+
+	        return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>';
+	       
+        }
+     
+    
+        function delFm(value, row) {
+        	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+        	console.log(row['_id']);
+        	    	return '<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#qrcodeModal" onclick="'+"affqrcode('"+row['_id']+"','','');"+'"><i class="fas fa-phone"></i></button>&nbsp;'+
+        		   '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'+
+               	   '<button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-info editbt" onclick="editobj('+"'"+row['_id']+"'"+')"><i class="fas fa-pencil-alt"></i></button>';
+    	
+        	
+        		}
+    
+    function affqrcode(id){
+	     //var qrcode = new QRCode("qrcode");
+	    //qrcode.makeCode(id);
+    }
+		
+		
+        $(document).ready(function () {
+
+            $('#clients').addClass("active");
+         
+              $('select[data-source]').each(function() {
+				var $select = $(this);
+				$select.append('<option value="0"></option>');
+				var i=0;
+  
+				$.ajax({
+				  url: $select.attr('data-source'),
+  				}).then(function(options) {
+  				options.map(function(option) {
+  				var $option = $('<option>');
+      
+      
+  				$option
+  					.val(option[$select.attr('data-valueKey')])
+  					.text(option[$select.attr('data-displayKey')]);
+  					
+  					$select.append($option);
+    				});
+
+  				});
+			});
+            	// Advanced 1
+			  $('.advancedAutoComplete').autoComplete({
+					resolver: 'custom',
+					events: {
+						search: function (qry, callback) {
+							// let's do a custom ajax call
+							var adr = document.getElementById("label").value;
+							var mdata=[];
+							$.ajax(
+								//'file.json',
+								"https://api-adresse.data.gouv.fr/search/?q="+adr+"&autocomplete=1"
+							).done(function (res) {
+								res.features.forEach(function(item){
+									console.log(item)
+									mdata.push({id: item.properties.id, text: item.properties.label,value : item });
+								})	
+					
+								callback(mdata)
+							});
+						}
+					}
+				});
+
+			  $('.advancedAutoComplete').on('autocomplete.select', function (evt, item) {
+					console.log('select');
+					console.log(item)
+					var lat = item.value.geometry.coordinates[1];
+					var long = item.value.geometry.coordinates[0];
+					$('#lat').val(lat);
+					$('#lng').val(long);
+					$('#idadr').val(item.id);
+					$('#num').val(item.value.properties.housenumber);
+					$('#rue').val(item.value.properties.street);
+					$('#cp').val(item.value.properties.postcode);
+					$('#ville').val(item.value.properties.city);
+					$('.basicAutoSelectSelected').html(JSON.stringify(item.value.geometry));
+				});
+
+        });
+         
+    </script>
+</body>
+
+</html>

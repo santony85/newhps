@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<% include head %>
+
+<body>
+
+    <div class="wrapper">
+		
+		<% include navbar %>
+
+        <!-- Page Content  -->
+        <div id="content">
+        
+        <div class="row">
+       	  <div class="col-2">
+		  	<button type="button" class="btn btn-primary newbt" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 5px;width:100%;">
+				 Ajouter
+			 </button>
+		  </div>
+          <div class="col-10">
+          <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Produits</li>
+			</ol>
+		  </nav>
+		  </div>
+		</div>
+		
+		<table data-toggle="table"
+		 	class="table table-condensed table-striped table-sm"
+            data-url="/list/produits"
+            data-pagination="true" 
+            data-search="true"
+            data-show-columns="true"
+            data-page-size="16"
+            id= "mtable"
+            >
+            
+			<thead>
+				<tr>
+                  
+
+                                <th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+                                <th data-field="code"    data-valign="middle" data-formatter="genericFm">Code</th>
+                                <th data-field="famille" data-valign="middle" data-formatter="genericFm">Famille</th>
+                                <th data-width="100px" data-field="_id"    data-valign="middle" data-formatter="delFm">Action</th>
+				</tr>
+			</thead>
+
+    </table>
+
+		</div>
+		<!-- /Page Content  -->
+		
+		
+    </div>
+    <!-- /wrapper  -->
+    
+    <!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+    
+      <form action="/addobj/newhpsusers" method="POST" id="myform"> 
+      <input type="hidden" name="level" value="2">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+      	 <input type="text" class="d-none" name="_id" id="_id">
+      	 <input type="text" class="d-none" name="type" id="type" value="com">
+      	 
+         <div class="form-group">
+		 	<label for="nom">Code:</label>
+		 	<input type="text" class="form-control" placeholder="Entrer le code" name="code" id="code" required>
+		 </div>
+		 
+		 <div class="form-group">
+		 	<label for="prenom">Famille:</label>
+		 	<input type="text" class="form-control" placeholder="Entrer la famille" name="famille" id="famille" required>
+		 </div>
+  
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" >Envoyer</button>
+      </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+    
+	<% include bsjs %>
+
+    <script type="text/javascript">
+    
+        function genericFm(value, row, index,field) {
+
+	        return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>';
+	       
+        }
+    
+    
+        function delFm(value, row) {
+        	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+        	return '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'+
+               	   '<button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-info editbt" onclick="editobj('+"'"+row['_id']+"'"+')"><i class="fas fa-pencil-alt"></i></button>';
+    	}
+    
+
+		
+        $(document).ready(function () {
+
+            $('#produits').addClass("active");
+            
+            
+        });
+         
+    </script>
+</body>
+
+</html>

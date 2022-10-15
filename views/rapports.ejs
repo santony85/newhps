@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<style>
+
+	
+	<% issues.forEach(function(item) { %>
+		.<%= item.nom %>{ 
+		
+		background-color: <%= item.color %>bd;
+	}
+		<% }); %> 
+		
+		.form-control {
+			font-size: 0.9em;
+			font-weight: bold !important;
+		}
+</style>
+<% include head %>
+
+<body>
+
+
+
+    <div class="wrapper">
+		
+		<% include navbar %>
+
+        <!-- Page Content  -->
+        <div id="content">
+        
+
+		 
+        
+        <div class="row">
+          <div class="col-12">
+          <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Rapports</li>
+			</ol>
+		  </nav>
+		  </div>
+		</div>
+			<div class="row">
+				<% if(user.type <2){ %> 
+				<div class="col-3">
+				<% } else {%>
+				<div class="col-3" style="visibility:hidden;">
+				<% } %>
+				
+					
+    <% if(user.type == 1) {%>
+	<select id="userId" class="form-control" name="userId" data-source="/listcollabcdv/<%= user._id%>" data-valueKey="id" data-displayKey="text" placeholder="Commercial 1" ></select>
+	<% } else {%>
+	<select id="userId" class="form-control" name="userId" data-source="/listcollab" data-valueKey="id" data-displayKey="text" placeholder="Commercial 1" ></select>
+	<% }%>
+		
+	</select>
+					
+					
+				</div>
+				<div class="col-6" id="sandbox-container">
+					<div class="input-daterange input-group date" id="datepicker" data-provide="datepicker">
+						<input type="text" class="form-control" id="dstart"/>
+						<span class="input-group-text">to</span>
+						<input type="text" class="form-control" id="dend"/>
+					</div>
+
+				</div>
+				<div class="col-2">
+					<button type="button" class="btn btn-primary" onclick="findDateRange(1)">
+						Rechercher
+					</button>
+				</div>
+			</div>
+		
+		<table data-toggle="table"
+		 	class="table table-condensed table-sm"
+            
+            data-pagination="true" 
+            data-search="true"
+            data-show-columns="false"
+            data-page-size="100"
+			data-show-footer="true"
+			data-flat="true"
+			data-detail-view="true"
+			data-detail-formatter="detailFormatter"
+			data-row-style="rowStyle"
+            id= "mtable"
+            data-page-list="[100, 200, 500, 1000]">
+            
+			<thead>
+				<tr>
+                  
+
+                                <th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+                                <th data-field="nom"    data-valign="middle" data-formatter="nomFm" >Client</th>
+                                <th data-field="nomcomhps1" data-valign="middle" data-formatter="genericFm">Commercial 1</th>
+								<th data-field="nomcomhps2" data-valign="middle" data-formatter="genericFm">Commercial 2</th>
+                                <th data-field="dateRdv" 	data-valign="middle" data-formatter="dateFm" data-footer-formatter="nbrdvFormatter">Date</th>
+                                <th data-field="issue"  data-align="right" data-formatter="genericFm" data-footer-formatter="nbventeFormatter">Issue</th>
+                                <th data-field="produits" data-align="right"   data-formatter="produitFm" data-footer-formatter="priceFormatter">Montant</th>
+								<% if(user.type === "0"){ %> 
+                                <th data-width="100px" data-field="_id"    data-valign="middle" data-formatter="delFm"></th>
+								<% } %> 
+
+
+				</tr>
+			</thead>
+
+
+
+    </table>
+
+		</div>
+		<!-- /Page Content  -->
+		
+		
+    </div>
+    <!-- /wrapper  -->
+    
+    <!-- Modal -->
+
+
+    
+	<% include bsjs %>
+
+	<style>
+	
+
+	
+		.bg-vente{
+			 background-color: #a1d377bd;
+		}
+		.bg-valid{
+			background-color: #ff9700bd;
+		}
+		.hdaqua{
+			background-color: #DDD;
+		}
+		.dropdown-menu {
+			min-width: 18rem;
+		}
+		.datepicker .datepicker-switch {
+			width: 240px;
+		}
+		.input-daterange input {
+			text-align: left;
+		}
+		<% issues.forEach( function( todo ){ %>
+			 .<%=todo.code%>{
+			  background-color: <%=todo.color%>;
+			 }
+		<% }); %>	
+	</style>
+
+	<script type="text/javascript">
+	
+	var userid = "<%= user._id%>";
+	var iscdv = "<%= user.iscdv%>";
+	var vtype = <%= user.type%>;
+	var uuid = userid;
+	if(vtype <2){
+		userid=0;
+	}
+
+		var isexp = 0;
+		var sommetot=0;		
+
+		function detailFormatter(index, row) {
+			console.log(row)
+			var html = [];
+			var total=0;
+			if(isexp==1){
+				$("#mtable").bootstrapTable('collapseAllRows');
+				isexp=0;
+			}
+			else isexp=1;
+
+			//$("#mtable").bootstrapTable('expandRow', index)
+			var client=
+					'  <div class="form-row">\n' +
+					'    <div class="form-group col-md-4">\n' +
+					'      <label for="inputEmail4">Nom</label>\n' +
+					'      <input type="text" class="form-control" value="'+row.nom+'">\n' +
+					'    </div>\n' +
+					'    <div class="form-group col-md-4">\n' +
+					'      <label for="inputPassword4">Prenom</label>\n' +
+					'      <input type="text" class="form-control" value="'+row.prenom+'">\n' +
+					'    </div>\n' +
+					'    <div class="form-group col-md-4">\n' +
+					'      <label for="inputTel">Tel</label>\n' +
+					'      <input type="text" class="form-control" value="'+row.tel+'">\n' +
+					'    </div>\n' +
+					'  </div>\n' +
+
+					'  <div class="form-row">\n' +
+
+					'  <div class="form-group col-md-1">\n' +
+					'  <div class="form-group">\n' +
+					'    <label for="inputAddress">Numero</label>\n' +
+					'    <input type="text" class="form-control" value="'+row.numAdr+'">\n' +
+					'  </div>\n' +
+					'    </div>\n' +
+
+					'  <div class="form-group col-md-5">\n' +
+					'    <div class="form-group">\n' +
+					'      <label for="inputAddress2">Adresse</label>\n' +
+					'      <input type="text" class="form-control" value="'+row.rue+'">\n' +
+					'    </div>\n' +
+					'  </div>\n' +
+					
+					  '    <div class="form-group col-md-1">\n' +
+					  '      <label for="inputCity">C.P</label>\n' +
+					  '      <input type="text" class="form-control" value="'+row.cp+'">\n' +
+					  '    </div>\n' +
+					  
+					  '    <div class="form-group col-md-5">\n' +
+					  '      <label for="inputZip">Ville</label>\n' +
+					  '      <input type="text" class="form-control" value="'+row.ville+'">\n' +
+					  '    </div>\n' +
+					  
+					'  </div>\n' 
+
+			var dtable='<table data-toggle="table"\n' +
+					' class="table table-condensed table-sm">' +
+					'<thead>\n' +
+					'<tr>\n' +
+					'<th>Qte</th>\n' +
+					'<th>Ref</th>\n' +
+					'<th>Designation</th>\n' +
+					'<th class="text-right" >P.u</th>\n' +
+					'<th class="text-right" >Total</th>\n' +
+					'</tr>\n' +
+					'</thead>\n' +
+					'<tbody>\n'
+
+
+				row.produits.forEach(function (doc) {
+					var ttc = parseInt(doc.qte) * parseFloat(doc.prix);
+					total += ttc;
+					dtable += '<tr>\n' +
+							'<td>'+doc.qte+'</td>\n' +
+							'<td>'+doc.famille+'</td>\n' +
+							'<td>'+doc.code+'</td>\n' +
+							'<td class="text-right">'+doc.prix+' €</td>\n' +
+							'<td class="text-right" >'+ttc.toFixed(2)+' €</td>\n' +
+							'</tr>\n'
+				})
+
+			dtable += '<tr>\n' +
+					'<td></td>\n' +
+					'<td></td>\n' +
+					'<td></td>\n' +
+					'<td class="text-left"><b>Total<b></td>\n' +
+					'<td class="text-right" ><b>'+total.toFixed(2)+' €</b></td>\n' +
+					'</tr>\n'
+
+				dtable += '</tbody>\n' +
+					'</table>'
+
+			if(row.produits.length == 0)dtable='Aucun produit'
+			var model='<div class="card">\n' +
+					'  <div class="card-header hdaqua"><h5>Client</h5></div>\n' +
+					'  <div class="card-body">'+client+'</div>\n' +
+					'</div>\n'+
+					'<div class="card">\n' +
+					'  <div class="card-header hdaqua"><h5>Produits</h5></div>\n' +
+					'  <div class="card-body">'+dtable+'</div>\n' +
+					'</div>';
+			$.each(row, function (key, value) {
+				html.push(model)
+			})
+			return model
+		}
+
+		function rowStyle(row) {
+			return {classes: row.issue}	
+		}
+		
+		function nbrdvFormatter(data) {
+			return data.length+' rdv'
+		}
+
+		function nbventeFormatter(data) {
+			return data.map(function (row) {
+				console.log(row)
+				if(row.issue=="VENTE")return 1
+				else return 0
+			}).reduce(function (sum, i) {
+				return sum+i
+			},0)+' ventes'
+
+		}
+		
+		function priceFormatter(data) {
+			var res = data.map(function (row) {
+				var val=0;
+				if(!row.produits)row.produits=[]
+				row.produits.forEach(function (doc) {
+					val += parseInt(doc.qte) * parseFloat(doc.prix)
+				})
+				return val;
+			}).reduce(function (sum, i) {
+				var ret =sum + i
+				return ret
+			}, 0).toFixed(2)+' €';
+			return '<a><b>'+res+'</b></a>';
+		}
+
+
+
+        function genericFm(value, row, index,field) {
+
+	        return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>';
+	       
+        }
+
+		function prixFm(value, row, index,field) {
+			if(value){
+	  	  		var mnt = parseFloat(value).toFixed(2);
+	  			return '<a snd-data-'+row['_id']+'="'+field+'">'+mnt+'</a>';	
+	        }
+			return ''
+   
+   		}
+		
+		function nomFm(value, row, index,field) {
+
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+row['prenom']+' '+row['nom']+'</a>';
+
+		}
+
+		function dateFm(value, row, index,field) {
+
+			
+			var today = new Date(value);
+			var dd = String(today.getDate()).padStart(2, '0');
+			var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+			var yyyy = today.getFullYear();
+			
+			today = mm + '/' + dd + '/' + yyyy;
+			
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+today+'</a>';
+		}
+
+		function produitFm(value, row, index,field) {
+        	var val=0;
+			if(!value)value=[]
+        	value.forEach(function (doc) {
+				if(doc.qte && doc.prix)val += parseInt(doc.qte) * parseFloat(doc.prix)
+				else val +=0;
+			})
+			if(val==0)return ''
+			else return '<a snd-data-'+row['_id']+'="'+field+'"><b>'+val.toFixed(2)+' €</b></a>';
+		}
+
+		function userFm(value, row, index,field) {
+			var val=row.prenom+' '+row.nom;
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+val+'</a>';
+		}
+    
+        function delFm(value, row) {
+        	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+        	return '&nbsp;&nbsp;<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>';
+    	}
+
+        $(document).ready(function () {
+
+			$('#rapports').addClass("active");
+
+			const d = new Date()
+			const ye = new Intl.DateTimeFormat('en', {year: 'numeric'}).format(d)
+			const mo = new Intl.DateTimeFormat('en', {month: '2-digit'}).format(d)
+			const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(d)
+			var de = `${ye}-${mo}-${da}`;
+			var ds = `${ye}-${mo}-01`;
+
+			var date = new Date();
+			var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+			$('#sandbox-container .input-group.date').datepicker({
+				format: "dd/mm/yyyy",
+				language: "fr",
+				autoclose: true,
+				todayHighlight: true
+			});
+
+			$('#dstart').datepicker('setDate', new Date(ds));
+
+			$('#dend').datepicker('setDate', new Date(de));
+
+			$('#mtable').on('load-success.bs.table', function (data) {
+				console.log(data)
+				$.ajax({
+					url: '/listrapportsdate/0/' + ds + '/' + de +'/'+userid,
+					type: 'get',
+					success: function (res) {
+						$("#mtable").bootstrapTable('load', res)
+					}
+				});
+			})
+
+			$('#mtable').on('expand-row.bs.table', function (index, row, $detail) {
+				if (isexp == 0) $("#mtable").bootstrapTable('expandRow', row)
+				console.log(row)
+
+			})
+
+			$('select[data-source]').each(function () {
+				var $select = $(this);
+				$select.append('<option value="0"></option>');
+				var i = 0;
+
+				$.ajax({
+					url: $select.attr('data-source'),
+				}).then(function (options) {
+					options.map(function (option) {
+						var $option = $('<option>');
+
+
+						$option
+								.val(option[$select.attr('data-valueKey')])
+								.text(option[$select.attr('data-displayKey')]);
+						if ($option.val() == "<%= iduser %>") $option.prop("selected", "selected");
+						$select.append($option);
+					});
+
+				});
+
+			});
+
+			$('#userId').on('change', function(){
+				var selectedText = $("#userId option:selected").val();
+				var dates =  getDateYYYYMMDDFormat($('#dstart').val());
+				var datef =  getDateYYYYMMDDFormat($('#dend').val());
+				
+				if(selectedText =="0"){window.location.href ="/rapports/0"}
+				else {
+				$.ajax({
+					url: '/listrapportsdate/'+selectedText+'/' + dates + '/' + datef+'/'+userid,
+					type: 'get',
+					success: function (res) {
+						$("#mtable").bootstrapTable('load', res)
+
+					}
+				});
+			  }
+
+			});
+
+			findDateRange(0);
+
+		})
+
+		function getDateYYYYMMDDFormat(date){
+			var tabSplit = date.split("/", 3);
+			return tabSplit[2]+"-"+tabSplit[1]+"-"+tabSplit[0];
+		}
+
+		function findDateRange(mode){
+			var dates =  getDateYYYYMMDDFormat($('#dstart').val());
+			var datef =  getDateYYYYMMDDFormat($('#dend').val());
+			var selectedText = "0"
+			if(mode==1)selectedText = $("#userId option:selected").val();
+			
+			<% if(user.type !== "1"){ %> 
+				$.ajax({
+					url:'/listrapportsdate/'+selectedText+'/'+dates+'/'+datef+'/'+userid,
+					type:'get',
+					success:function(res){
+						$("#mtable").bootstrapTable('load', res)
+					}
+				});
+			
+			<% } else {%>
+				$.ajax({
+					url:'/listrapportsdatecdv/'+selectedText+'/'+dates+'/'+datef+'/'+userid+"/<%= user._id%>",
+					type:'get',
+					success:function(res){
+						$("#mtable").bootstrapTable('load', res)
+					}
+				});
+			
+			<% } %>
+			
+
+			
+			
+		}
+
+    </script>
+</body>
+
+</html>

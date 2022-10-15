@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link href='/lib/main.css' rel='stylesheet' />
+<script src='/lib/main.js'></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+
+  	var iduser = "<%=iduser%>";
+	var vtype = "<%=type%>";
+	
+
+  document.addEventListener('DOMContentLoaded', function() {
+	//var srcCalendarEl = document.getElementById('source-calendar');
+	var destCalendarEl = document.getElementById('destination-calendar');
+	
+	/*$.ajax({
+		  dataType: "json",
+		  url: "/restobj/"+iduser+"/contact",
+		  data: function(){},
+		  success: function(data){
+			var srcCalendar = new FullCalendar.Calendar(srcCalendarEl, {
+				  height: '100%',
+				  expandRows: true,
+				  timeZone: 'Europe/Paris',
+				  headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'dayGridMonth,timeGridWeek,timeGridDay'
+				  },	
+				  editable: true,
+				  initialDate: new Date(),
+				  initialView: 'timeGridWeek',
+				  startParam: "start_date",
+				  endParam: "end_date",
+				  slotMinTime: '08:00',
+				  slotMaxTime: '20:00',
+				  weekNumbers: true,
+				  firstDay: 1,
+				  locale: 'fr',
+				  events: data.data,
+				  eventDrop: function(info) {
+						var myobj = info.event._def.extendedProps;
+						ajaxput(myobj,info,"");
+					}
+				});  
+			srcCalendar.render();
+		  }
+		});*/
+
+	$.ajax({
+	  dataType: "json",
+	  url: "/restobj/"+iduser+"/rdv",
+	  data: function(){},
+	  success: function(data){
+	    var destCalendar = new FullCalendar.Calendar(destCalendarEl, {
+
+			expandRows: true,
+			timeZone: 'UTC',
+			locale: 'fr',
+			headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'timeGridDay,timeGridWeek,dayGridMonth'
+				  },
+	  
+			  initialDate: new Date(),
+			  initialView: 'timeGridWeek',
+			  firstDay: 1,
+			  editable: true,
+			  events: data.data,
+			  startParam: "start_date",
+			  endParam: "end_date",
+			  slotMinTime: '08:00',
+  			  slotMaxTime: '20:00',
+			  weekNumbers: true,
+
+			  droppable: true, // will let it receive events!
+			  eventReceive: function(info) {
+				var myobj = info.event._def.extendedProps;
+				ajaxput(myobj,info,"rdv");
+			    },
+			  eventDrop: function(info) {
+				  var myobj = info.event._def.extendedProps;
+				  ajaxput(myobj,info,"");
+			  },
+			  eventAllow: function(dropInfo, draggedEvent) {
+	
+				if(draggedEvent._instance){
+				  var todayd = new Date();
+				  var st = new Date(draggedEvent._instance.range.start);
+				  if(st < todayd)return false;
+				  else return true;
+				}
+				else {
+					console.log("out")
+					return true;
+				}
+				
+
+				  }
+				  
+			  
+			});
+		destCalendar.render();
+	  }
+	});
+
+  });
+  
+  function ajaxput(myobj,info,status){
+	var item=JSON.stringify(myobj)  
+	var newob = JSON.parse(item)
+	var dateH=new Date(info.event._instance.range.start);
+	var dstr=dateH.toISOString()
+	
+	newob.dateRdv=dstr;
+	var newHr=dstr.substr(11, 5);
+	newob.heureRDV=newHr;
+	if(status !="")newob.status=status;
+	newob.nomcomhps1="<%=nomcli%>";
+	newob.idcomhps1="<%=iduser%>";
+	 
+	$.ajax({
+		type: 'put',
+		url: "/restobj/<%=iduser%>/"+newob.status+"/"+info.event._def.extendedProps._id,
+		data: JSON.stringify(newob),
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+		console.log(data)
+		}
+	});
+	  
+	
+  }
+
+</script>
+<style>
+
+html {
+	 width: 100%;
+	 height: 100%;
+ }
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	font-size: 14px;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  }
+
+  #source-calendar,
+  #destination-calendar {
+	height:99%;
+	width: 99%;
+  }
+
+  
+
+</style>
+</head>
+<body>
+	
+  <!--<div style="width:39%;height:100%;margin-right: 20px;" id='source-calendar'></div>-->
+  <div id='destination-calendar'></div>
+
+</body>
+</html>

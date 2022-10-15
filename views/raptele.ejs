@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<style>
+	.bg-vente{
+		background-color: #3D9970bd;
+	}
+</style>
+<% include head %>
+
+<body>
+
+    <div class="wrapper">
+		
+		<% include navbar %>
+
+        <!-- Page Content  -->
+        <div id="content">
+        
+        <div class="row">
+          <div class="col-12">
+          <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Rapports</li>
+			</ol>
+		  </nav>
+		  </div>
+		</div>
+			<div class="row">
+				<div class="col-4">
+					<select
+							id="userId"
+							class="form-control"
+							name="userId"
+							data-source="/listcollab/<%=idclient%>/tel"
+							data-valueKey="id"
+							data-displayKey="text">
+					</select>
+				</div>
+				<div class="col-6" id="sandbox-container">
+					<div class="input-daterange input-group date" id="datepicker" data-provide="datepicker">
+						<input type="text" class="form-control" id="dstart"/>
+						<span class="input-group-text">to</span>
+						<input type="text" class="form-control" id="dend"/>
+					</div>
+
+				</div>
+				<div class="col-2">
+					<button type="button" class="btn btn-primary" onclick="findDateRange()">
+						Rechercher
+					</button>
+				</div>
+			</div>
+		
+		<table data-toggle="table"
+		 	class="table table-condensed table-sm"
+            data-url="/list/rapports/<%=idclient%>"
+            data-pagination="true" 
+            data-search="true"
+            data-show-columns="false"
+            data-page-size="100"
+			data-show-footer="true"
+			data-flat="true"
+			data-detail-view="true"
+			data-detail-formatter="detailFormatter"
+			data-row-style="rowStyle"
+            id= "mtable"
+            data-page-list="[100, 200, 500, 1000]">
+            
+			<thead>
+				<tr>
+                  
+
+                                <th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+                                <th data-field="nom"    data-valign="middle" data-formatter="nomFm" >Client</th>
+                                <th data-field="user" data-valign="middle" data-formatter="userFm">Commercial</th>
+                                <th data-field="date" 	data-valign="middle" data-formatter="dateFm" data-footer-formatter="nbrdvFormatter">Date</th>
+                                <th data-field="issues"  data-align="right" data-formatter="genericFm" data-footer-formatter="nbventeFormatter">Issue</th>
+                                <th data-field="produits" data-align="right"  data-formatter="produitFm" data-footer-formatter="priceFormatter">Montant</th>
+                               <!-- <th data-width="100px" data-field="_id"    data-valign="middle" data-formatter="delFm">Action</th> -->
+
+
+				</tr>
+			</thead>
+
+
+
+    </table>
+
+		</div>
+		<!-- /Page Content  -->
+		
+		
+    </div>
+    <!-- /wrapper  -->
+    
+    <!-- Modal -->
+
+
+    
+	<% include bsjs %>
+
+	<style>
+		.bg-vente{
+			 background-color: #a1d377bd;
+		}
+		.bg-valid{
+			background-color: #ff9700bd;
+		}
+		.hdaqua{
+			background-color: #7FDBFF;
+		}
+		.dropdown-menu {
+			min-width: 18rem;
+		}
+		.datepicker .datepicker-switch {
+			width: 240px;
+		}
+		.input-daterange input {
+			text-align: left;
+		}
+				<% issues.forEach( function( todo ){ %>
+			 .<%=todo.code%>{
+			  background-color: <%=todo.color%>;
+			 }
+		<% }); %>
+	</style>
+
+	<script type="text/javascript">
+
+		var isexp = 0;
+
+		function detailFormatter(index, row) {
+			console.log(row)
+			var html = [];
+			var total=0;
+			if(isexp==1){
+				$("#mtable").bootstrapTable('collapseAllRows');
+				isexp=0;
+			}
+			else isexp=1;
+
+			//$("#mtable").bootstrapTable('expandRow', index)
+			var client=
+					'  <div class="form-row">\n' +
+					'    <div class="form-group col-md-6">\n' +
+					'      <label for="inputEmail4">Nom</label>\n' +
+					'      <input type="text" class="form-control" id="inputEmail4" value="'+row.nom+'">\n' +
+					'    </div>\n' +
+					'    <div class="form-group col-md-6">\n' +
+					'      <label for="inputPassword4">Prenom</label>\n' +
+					'      <input type="text" class="form-control" id="inputPassword4" value="'+row.prenom+'">\n' +
+					'    </div>\n' +
+					'  </div>\n' +
+
+					'  <div class="form-row">\n' +
+
+					'    <div class="form-group col-md-2">\n' +
+					'  <div class="form-group">\n' +
+					'    <label for="inputAddress">Numero</label>\n' +
+					'    <input type="text" class="form-control" id="inputAddress" value="'+row.num+'">\n' +
+					'  </div>\n' +
+					'    </div>\n' +
+
+					'    <div class="form-group col-md-10">\n' +
+					'  <div class="form-group">\n' +
+					'    <label for="inputAddress2">Adresse</label>\n' +
+					'    <input type="text" class="form-control" id="inputAddress2" value="'+row.rue+'">\n' +
+					'  </div>\n' +
+					'    </div>\n' +
+
+					'  </div>\n' +
+
+
+					'  <div class="form-row">\n' +
+					'    <div class="form-group col-md-2">\n' +
+					'      <label for="inputCity">C.P</label>\n' +
+					'      <input type="text" class="form-control" id="inputCity" value="'+row.cp+'">\n' +
+					'    </div>\n' +
+
+
+					'    <div class="form-group col-md-7">\n' +
+					'      <label for="inputZip">Ville</label>\n' +
+					'      <input type="text" class="form-control" id="inputZip" value="'+row.ville+'">\n' +
+					'    </div>\n' +
+
+					'    <div class="form-group col-md-3">\n' +
+					'      <label for="inputTel">Tel</label>\n' +
+					'      <input type="text" class="form-control" id="inputTel" value="'+row.tel+'">\n' +
+					'    </div>\n' +
+
+
+					'  </div>\n'
+
+			var dtable='<table data-toggle="table"\n' +
+					' class="table table-condensed table-sm">' +
+					'<thead>\n' +
+					'<tr>\n' +
+					'<th>Qte</th>\n' +
+					'<th>Ref</th>\n' +
+					'<th>Designation</th>\n' +
+					'<th class="text-right" >P.u</th>\n' +
+					'<th class="text-right" >Total</th>\n' +
+					'</tr>\n' +
+					'</thead>\n' +
+					'<tbody>\n'
+
+
+				row.produits.forEach(function (doc) {
+					var ttc = parseInt(doc.qte) * parseFloat(doc.prix);
+					total += ttc;
+					dtable += '<tr>\n' +
+							'<td>'+doc.qte+'</td>\n' +
+							'<td>'+doc.ref+'</td>\n' +
+							'<td>'+doc.nom+'</td>\n' +
+							'<td class="text-right">'+doc.prix+' €</td>\n' +
+							'<td class="text-right" >'+ttc.toFixed(2)+' €</td>\n' +
+							'</tr>\n'
+				})
+
+			dtable += '<tr>\n' +
+					'<td></td>\n' +
+					'<td></td>\n' +
+					'<td></td>\n' +
+					'<td class="text-left"><b>Total<b></td>\n' +
+					'<td class="text-right" ><b>'+total.toFixed(2)+' €</b></td>\n' +
+					'</tr>\n'
+
+				dtable += '</tbody>\n' +
+					'</table>'
+
+			if(row.produits.length == 0)dtable='Aucun produit'
+			var model='<div class="card">\n' +
+					'  <div class="card-header hdaqua"><h5>Client</h5></div>\n' +
+					'  <div class="card-body">'+client+'</div>\n' +
+					'</div>\n'+
+					'<div class="card">\n' +
+					'  <div class="card-header hdaqua"><h5>Produits</h5></div>\n' +
+					'  <div class="card-body">'+dtable+'</div>\n' +
+					'</div>';
+			$.each(row, function (key, value) {
+				html.push(model)
+			})
+			return model
+		}
+
+		function rowStyle(row) {
+			return {classes: row.issues}	
+		}
+
+		function nbrdvFormatter(data) {
+			return data.length+' rdv'
+		}
+
+		function nbventeFormatter(data) {
+			return data.map(function (row) {
+				console.log(row)
+				if(row.issues=="VENTE")return 1
+				else return 0
+			}).reduce(function (sum, i) {
+				return sum+i
+			},0)+' ventes'
+
+		}
+
+		function priceFormatter(data) {
+			var res = data.map(function (row) {
+				var val=0;
+				row.produits.forEach(function (doc) {
+					val += parseInt(doc.qte) * parseFloat(doc.prix)
+				})
+				return val;
+			}).reduce(function (sum, i) {
+				var ret =sum + i
+				return ret
+			}, 0).toFixed(2)+' €';
+			return '<a><b>'+res+'</b></a>';
+		}
+
+        function genericFm(value, row, index,field) {
+
+	        return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>';
+	       
+        }
+
+		function nomFm(value, row, index,field) {
+
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+row['prenom']+' '+row['nom']+'</a>';
+
+		}
+
+		function dateFm(value, row, index,field) {
+			var tabSplit = value.split("-", 3);
+			var val = tabSplit[2].split(" ", 3);
+			var res = val[0]+'/'+tabSplit[1]+'/'+tabSplit[0]+' '+val[1]
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+res+'</a>';
+		}
+
+		function produitFm(value, row, index,field) {
+        	var val=0;
+        	value.forEach(function (doc) {
+        		val += parseInt(doc.qte) * parseFloat(doc.prix)
+			})
+			if(val==0)return ''
+			else return '<a snd-data-'+row['_id']+'="'+field+'"><b>'+val.toFixed(2)+' €</b></a>';
+		}
+
+		function userFm(value, row, index,field) {
+			var val=value.prenom+' '+value.nom;
+			return '<a snd-data-'+row['_id']+'="'+field+'">'+val+'</a>';
+		}
+    
+        function delFm(value, row) {
+        	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+        	return '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'+
+               	   '<button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-info editbt" onclick="editobj('+"'"+row['_id']+"'"+')"><i class="fas fa-pencil-alt"></i></button>';
+    	}
+
+        $(document).ready(function () {
+
+			$('#raptele').addClass("active");
+
+			const d = new Date()
+			const ye = new Intl.DateTimeFormat('en', {year: 'numeric'}).format(d)
+			const mo = new Intl.DateTimeFormat('en', {month: '2-digit'}).format(d)
+			const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(d)
+			var de = `${ye}-${mo}-${da}`;
+			var ds = `${ye}-${mo}-01`;
+
+			var date = new Date();
+			var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+			$('#sandbox-container .input-group.date').datepicker({
+				format: "dd/mm/yyyy",
+				language: "fr",
+				autoclose: true,
+				todayHighlight: true
+			});
+
+			$('#dstart').datepicker('setDate', new Date(ds));
+
+			$('#dend').datepicker('setDate', new Date(de));
+
+			$('#mtable').on('load-success.bs.table', function (data) {
+				$.ajax({
+					url: '/listrapportsdate/0/' + ds + '/' + de,
+					type: 'get',
+					success: function (res) {
+						$("#mtable").bootstrapTable('load', res)
+					}
+				});
+			})
+
+			$('#mtable').on('expand-row.bs.table', function (index, row, $detail) {
+				if (isexp == 0) $("#mtable").bootstrapTable('expandRow', row)
+				console.log(row)
+
+			})
+
+			$('select[data-source]').each(function () {
+				var $select = $(this);
+				$select.append('<option value="0"></option>');
+				var i = 0;
+
+				$.ajax({
+					url: $select.attr('data-source'),
+				}).then(function (options) {
+					options.map(function (option) {
+						var $option = $('<option>');
+
+
+						$option
+								.val(option[$select.attr('data-valueKey')])
+								.text(option[$select.attr('data-displayKey')]);
+						if ($option.val() == "<%= iduser %>") $option.prop("selected", "selected");
+						$select.append($option);
+					});
+
+				});
+
+			});
+
+			$('#userId').on('change', function(){
+				var selectedText = $("#userId option:selected").val();
+				var dates =  getDateYYYYMMDDFormat($('#dstart').val());
+				var datef =  getDateYYYYMMDDFormat($('#dend').val());
+
+				$.ajax({
+					url: '/listrapportsdate/'+selectedText+'/' + dates + '/' + datef,
+					type: 'get',
+					success: function (res) {
+						$("#mtable").bootstrapTable('load', res)
+
+					}
+				});
+
+			});
+
+
+		})
+
+		function getDateYYYYMMDDFormat(date){
+			var tabSplit = date.split("/", 3);
+			return tabSplit[2]+"-"+tabSplit[1]+"-"+tabSplit[0];
+		}
+
+		function findDateRange(){
+			var dates =  getDateYYYYMMDDFormat($('#dstart').val());
+			var datef =  getDateYYYYMMDDFormat($('#dend').val());
+			var selectedText = $("#userId option:selected").val();
+			$.ajax({
+				url:'/listrapportsdate/'+selectedText+'/'+dates+'/'+datef,
+				type:'get',
+				success:function(res){
+					$("#mtable").bootstrapTable('load', res)
+				}
+			});
+		}
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<% include head %>
+<style>
+		.picker {
+			border-radius: 5px;
+			width: 64px;
+			height: 36px;
+			cursor: pointer;
+			-webkit-transition: all linear .2s;
+			-moz-transition: all linear .2s;
+			-ms-transition: all linear .2s;
+			-o-transition: all linear .2s;
+			transition: all linear .2s;
+			border: thin solid #eee;
+		}
+		.picker:hover {
+			transform: scale(1.1);
+		}
+	</style>
+
+
+<body>
+
+<div class="wrapper">
+	
+	<% include navbar %>
+
+    <!-- Page Content  -->
+    <div id="content">
+    
+    <div class="row">
+	
+   	 <div class="col-2">
+	  	<button type="button" class="btn btn-primary newbt" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 5px;">
+			 Nouveau param
+		 </button>
+	  </div>
+	  
+      <div class="col-10">
+      <nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Parametres</li>
+		</ol>
+	  </nav>
+	  </div>
+	</div>
+	
+		<div id="accordion">
+
+	    	<div class="card">
+		<div class="card-header" id="headingOne">
+		  <h5 class="mb-0">
+			<button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+			  <h2>Issues</h2>
+			</button>
+		  </h5>
+		</div>
+		<div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+		  <div class="card-body">
+<table data-toggle="table"
+	 class="table table-condensed table-sm"
+	data-url="/list/issues/<%=idclient%>"
+	data-pagination="false" 
+	data-search="true"
+	  data-single-select="true"
+	  data-click-to-select="true"
+	data-show-columns="false"
+	data-page-size="10"
+	id= "mtablef">
+	
+	<thead>
+		<tr>
+			<th data-checkbox="true" data-field="issum" data-formatter="checkFm"></th>
+			<th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+			<th data-field="nom"    data-valign="middle" data-formatter="genericFm">Nom</th>
+			<th data-width="50px" data-field="color"    data-valign="middle" data-formatter="colorFm">Couleur</th>
+			<th data-width="50px" data-field="_id"    data-valign="middle" data-formatter="delFm2">Action</th>
+		</tr>
+	</thead>
+
+	</table>
+		  </div>
+		</div>
+	  </div>
+
+	    </div>
+
+	  </div>
+	  
+	</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal-content">
+
+  <form action="/addobj/issues" method="POST" id="myformf"> 
+ 
+  <input type="text" class="d-none" name="issum" id="issum" value="false">
+  
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalCenterTitle">Issues</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    
+  </div>
+  
+  <div class="modal-body">
+ 
+  	
+  	 
+     <div class="form-group">
+	 	<label for="nom">Nom:</label>
+	 	<input type="text" class="form-control" placeholder="Entrer le nom" name="nom" required>
+	 </div>
+	 
+	 <div class="form-group">
+	 	<label for="nom">Couleur:</label>
+        <input type="color" class="form-control input-lg" name="color"/>
+	 </div>
+	 
+
+
+	 
+  </div>
+  
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+      <button type="submit" class="btn btn-primary" >Envoyer</button>
+  </div>
+  </form>
+  
+</div>
+</div>
+</div>
+
+
+<% include bsjs %>
+
+<script type="text/javascript">
+
+		var idFamSel="";
+		var nomFamSel="";
+		
+		
+		
+		
+    function genericFm(value, row, index,field) {
+
+        return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>';
+       
+    }
+        function checkFm(value, row, index,field) {
+	        if(value==="false")return false;
+	        else return true;
+
+       
+    }
+
+
+    function delFm(value, row) {
+    	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+    	return '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'+
+           	   '<button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-info editbt" onclick="editobjP('+"'"+row['_id']+"'"+')"><i class="fas fa-pencil-alt"></i></button>';
+	}
+
+    function delFm2(value, row) {
+    	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+    	return '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'
+    	}
+    	
+        function colorFm(value, row) {
+    	//return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+    	return '<button type="button" class="btn" style="background:'+value+';">&nbsp;&nbsp;&nbsp;&nbsp;</button>&nbsp;'
+    	}	
+
+function initf1(){
+	$('#myformf')[0].reset();
+}
+
+function initf2(){
+	$('#myformp')[0].reset();
+	//$('.idfamille input').val(idFamSel);
+	//$('#nomfamille input').val(nomFamSel);
+	document.getElementById("idfamille").setAttribute('value', idFamSel);
+	document.getElementById("nomfamille").setAttribute('value', nomFamSel);
+}
+
+        function editobjP(mid){
+			    $('#myformp')[0].reset();
+				//$('input[name=_id]').val(mid);
+				$('[snd-data-'+mid.toString()+']').each(function(i, el) // Temporary for demo purpose only
+					{
+					var $this   = $(el);
+					var label   = $this.attr("snd-data-"+mid);
+					var valeur  = $this.html();
+					$('input[name='+label+']').val(valeur);
+					});
+			
+		}
+		
+
+	
+    $(document).ready(function () {
+	    
+
+        $('#params').addClass("active");
+        
+        $('#cp4').colorpicker({"color": "#16813D"});
+        
+        /*$( ".bootstrap-table .fixed-table-toolbar" ).prepend('<div class="float-left btn-group"><button type="button" onclick="initf2();" class="btn btn-primary newbt" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 8px;">Ajouter</button></div>'); */
+        
+        $( ".bootstrap-table .fixed-table-toolbar" ).prepend('<div class="float-left btn-group"><button type="button" class="btn btn-primary newbt" onclick="initf1();" data-toggle="modal" data-target="#exampleModalCenter2" style="margin-top: 8px;">Ajouter</button></div>'); 
+        
+             $("#myformf").on('submit', function(e){
+			 	e.preventDefault();
+				$.ajax({
+					url:'/addobj/issues/'+idclient,
+					type:'post',
+					data:$('#myformf').serialize(),
+					success:function(res){
+						//$('#exampleModalCenter').modal('hide');
+						window.location.href = '/'+page;
+        			}
+    			});
+    			return false;
+            });	
+        
+             $("#myformp").on('submit', function(e){
+			 e.preventDefault();
+				$.ajax({
+					url:'/addobj/produits/'+idclient,
+					type:'post',
+					data:$('#myformp').serialize(),
+					success:function(res){
+						//$('#exampleModalCenter').modal('hide');
+						window.location.href = '/'+page;
+        			}
+    			});
+    			return false;
+            });	
+            
+   			$('#mtablef').on('check.bs.table', function (e, arg1) {
+ 				//alert(JSON.stringify(arg1));
+ 				$.ajax({
+					url:'/updatefield/issues/'+arg1._id+"/issum/true/false",
+					type:'get',
+					success:function(res){
+				
+						
+        			}
+    			});
+			})
+ 
+    });
+     
+</script>
+</body>
+
+</html>

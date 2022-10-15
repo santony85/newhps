@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<script src="/codebase/dhtmlxscheduler.js?v=5.3.4" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="/codebase/dhtmlxscheduler_material.css?v=5.3.4" type="text/css" charset="utf-8">
+	<script src="/codebase/locale/locale_fr.js?v=5.3.4" type="text/javascript" charset="utf-8"></script>
+	<script src="/codebase/ext/dhtmlxscheduler_readonly.js?v=5.3.4" type="text/javascript" charset="utf-8"></script>
+
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+	<style>
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		height: 100%;
+		overflow: hidden;
+	}
+	.newClass{
+		visibility: hidden;
+	height: 0px !important;
+	margin: 0px !important;
+	}
+	.dhx_cal_event_clear {
+
+	color: white;
+}
+.dhtmlx_message_area{
+	visibility: hidden;
+}
+	</style>
+	
+	<script>
+		function allowDrop(ev) {
+		  ev.preventDefault();
+		}
+		
+		function drag(ev) {
+	
+		  ev.dataTransfer.setData("text", ev.target.id);
+		}
+		
+		function drop(ev) {
+		  ev.preventDefault();
+		  var data = ev.dataTransfer.getData("text");
+		  alert(data)
+		  ev.target.appendChild(document.getElementById(data));
+		}
+	</script>
+		
+	
+	<script>
+	
+	function initCalendar(){
+	scheduler.config.prevent_cache = true;
+	scheduler.config.details_on_dblclick=true;
+	scheduler.config.details_on_create=true;
+	scheduler.config.event_duration = 60; //specify event duration in minutes for auto end time
+	scheduler.config.auto_end_date = true;
+	scheduler.config.first_hour = 8;
+	scheduler.config.last_hour = 21;
+	scheduler.config.limit_time_select = true;
+	scheduler.config.mark_now = true;
+	scheduler.config.time_step = 30;
+	
+	scheduler.config.occurrence_timestamp_in_utc = true;
+	
+	
+	scheduler.config.include_end_by = true;
+	scheduler.config.repeat_precise = true;
+	
+	var format = scheduler.date.date_to_str("%H:%i");
+	scheduler.config.hour_size_px = 88;
+	scheduler.templates.hour_scale = function(date){
+		var step = 60;
+		var html = "";
+		for (var i=0; i<60/step; i++){
+			html += "<div style='height:44px;line-height:44px;'>"+format(date)+"</div>";
+			date = scheduler.date.add(date, step, "minute");
+		}
+		return html;
+	}
+	
+
+	
+	scheduler.init('scheduler_here',new Date(),"week");
+	
+
+	
+	
+	var ids = "<%=iduser%>";
+	var vtype = "<%=type%>";
+	if(ids !="0")dataCalendar(ids,vtype)
+	
+		
+}
+
+	function dataCalendar(iduser,vtype){
+
+//scheduler.clearAll();
+//scheduler.resetLightbox();
+
+
+
+	scheduler.locale.labels.section_type = "Client";
+	scheduler.locale.labels.section_etat = "Etat";
+	scheduler.locale.labels.section_nomuser = "Collaborateur";
+	
+	scheduler.config.lightbox.sections = [
+	
+		//{name: "nomuser", type: "template", map_to: "nomuser", default_value: nomuser },
+		{name: "Correspondant", type: "template", map_to: "nomtel", default_value: "" },
+		{name: "idtele", type: "templateh", map_to: "idtele", default_value: "" },
+		{name: "Client", type: "template", map_to: "nom", default_value: "" },
+		{name: "time", height: 72, type: "time", map_to: "auto"},
+		{name: "Commentaire", map_to: "commentaire", type: "textarea" },
+		{name: "Rapport", map_to: "rapport", type: "textarea" },
+
+		{name: "color", type: "templateh", map_to: "color", default_value: "#5332fa" },
+		{name: "etat",  type: "templateh", map_to: "etat", default_value: "0" },
+		{name: "id",  type: "templateh", map_to: "_id", default_value: "0" },
+		
+	];
+	
+
+	
+
+	scheduler.load("/liststate");
+	scheduler.load("/restobj/"+iduser+"/"+vtype);
+	
+	var dp = new dataProcessor("/restobj/"+iduser+"/"+vtype);
+	dp.init(scheduler);
+	dp.setTransactionMode("REST",false);
+	
+	if(vtype=="rdv"){
+		scheduler.attachEvent("onExternalDragIn", function (id, source, e){
+			scheduler.getEvent(id).text = source.innerHTML;
+			return true;
+		});
+	}	
+	
+	scheduler.attachEvent("onLightbox", function(){
+			$( ".dhx_cal_templateh" ).each(function() {
+				var l1=$( this ).parent();
+				l1[0].className += " newClass";
+			});
+	});
+	
+	scheduler.attachEvent("onEventSave", function(id,e){
+		//scheduler.getEvent(id).text = e.nom;
+		scheduler.updateEvent(id); // renders the updated event
+		return true;
+	});
+
+	scheduler.attachEvent("onEventLoading", function(ev){
+		var todayd = new Date();
+		var st = new Date(ev.start_date);
+		if(st < todayd)ev.readonly=true;
+		else ev.readonly =false;
+		return true;
+	});
+
+	
+	function block_readonly(id){
+		if (!id) return true;
+		return !this.getEvent(id).readonly;
+		}
+		
+	if(vtype=="rdv"){
+	  scheduler.attachEvent("onBeforeDrag",block_readonly)
+	  scheduler.attachEvent("onClick",block_readonly)	
+	}
+	else{
+	   scheduler.attachEvent("onBeforeDrag",function(){
+		   return true;
+	   })
+  	   scheduler.attachEvent("onClick",block_readonly)	
+	}
+
+
+	
+	scheduler.templates.event_text = scheduler.templates.event_bar_text = function(start, end, event){
+		
+		return "<b>"+event.text+"</b><br><b style='color:#e2ff00;'>"+event.status+"</b>";
+	};
+	
+	scheduler.attachEvent("onDataRender", function(){
+		$( ".dhx_cal_event" ).each(function() {
+			var l1=$( this );
+
+			//l1[0].ondrop="drop(event)";
+			//l1[0].ondragover="allowDrop(event)"
+			//l1[0].className += " newClass";
+			
+			//l1[0].outerHTML = l1[0].outerHTML.substring(0, 4) + ' draggable="true" ondragstart="drag(event)" ' + l1[0].outerHTML.substring(4);
+			//console.log(l1[0].outerHTML)
+		});
+	});
+	
+	scheduler.attachEvent("onEventDrag", function (id, mode, e){
+		console.log(e)
+	});
+	
+	scheduler.attachEvent("onEventDrag", function (id, mode, e){
+		console.log(e)
+	});
+	
+	scheduler.attachEvent("onEventDragOut", function (id, e){
+		console.log(e)
+	});
+
+
+}	
+
+
+scheduler.attachEvent("onEventDropOut", function(id, event, to_scheduler, e){
+	alert("OUT")
+	if(to_scheduler)
+		dhtmlx.message("<b>" +event.text + "</b>  has gone from the scheduler<b>#1</b>");
+	return true;
+});
+
+
+
+
+	</script>
+
+
+</head>
+
+
+<body onload="initCalendar();">
+
+
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;' >
+	<div class="dhx_cal_navline">
+		<div class="dhx_cal_prev_button">&nbsp;</div>
+		<div class="dhx_cal_next_button">&nbsp;</div>
+		<div class="dhx_cal_today_button"></div>
+		<div class="dhx_cal_date"></div>
+		<div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+		<div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+		<div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+	</div>
+	<div class="dhx_cal_header">
+	</div>
+	<div class="dhx_cal_data">
+	</div>
+</div>
+	
+
+		 
+
+</body>
+
+</html>

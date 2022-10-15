@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+	
+	<% include head %>
+
+<link href='/lib/main.css' rel='stylesheet' />
+<script src='/lib/main.min.js'></script>
+
+<style>
+	.form-group {
+		font-size: 1.1rem;
+	}
+</style>
+
+
+
+<script>
+
+  	var iduser = "<%=iduser%>";
+	var iduser2 = "<%=iduser2%>";
+	var vtype = "<%=type%>";
+	
+  document.addEventListener('DOMContentLoaded', function() {
+	var srcCalendarEl = document.getElementById('source-calendar');
+	var destCalendarEl = document.getElementById('destination-calendar');
+	/*
+	$.ajax({
+		  dataType: "json",
+		  url: "/restobj/"+iduser+"/contact",
+		  data: function(){},
+		  success: function(data){
+			var clistRdv = [];
+			data.data.forEach((elm)=>{
+				  clistRdv.push(elm)
+			  })    
+			var srcCalendar = new FullCalendar.Calendar(srcCalendarEl, {
+				  height: '99%',
+				  expandRows: true,
+				  timeZone: 'Europe/Paris',
+				  headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'timeGridDay,timeGridWeek,dayGridMonth'
+				  },	
+				  editable: true,
+				  initialDate: new Date(),
+				  initialView: 'timeGridWeek',
+				  startParam: "start_date",
+				  endParam: "end_date",
+				  slotMinTime: '08:00',
+				  slotMaxTime: '18:00',
+				  weekNumbers: true,
+				  firstDay: 1,
+				  locale: 'fr',
+				  hiddenDays: [ 0 ],
+				  dayHeaders:true,
+				  buttonText: {
+						year: "year",
+						today: "Aujourd'hui",
+						month: "Mois",
+						week: "Semaine",
+						day: "Jour",
+						list: "Liste",
+					  },
+			      allDayText: 'Comm.',
+				  weekText: 'S',
+				  businessHours: [{
+						// days of week. an array of zero-based day of week integers (0=Sunday)
+						daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+						startTime: '8:00', // a start time (10am in this example)
+						endTime: '12:00', // an end time (6pm in this example)
+					  },
+					  {
+						  // days of week. an array of zero-based day of week integers (0=Sunday)
+						  daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+						  startTime: '13:00', // a start time (10am in this example)
+						  endTime: '18:00', // an end time (6pm in this example)
+						}],
+				  events: data.data,
+				  eventDrop: function(info) {
+						var myobj = info.event._def.extendedProps;
+						ajaxput(myobj,info,"");
+					},
+					
+				  eventOverlap: function(stillEvent, movingEvent) {
+					  return stillEvent.allDay && movingEvent.allDay;
+					},
+					eventClick: function(info) {
+						  if (info.event._def.ui.display !== "background") {
+							  editobjNEW(info.event.extendedProps._id,clistRdv);
+							  $('#exampleModalCenter').modal('show')
+						  }	  
+						}
+				});  
+			srcCalendar.render();
+		  }
+		});
+    */
+	$.ajax({
+	  dataType: "json",
+	  url: "/restobj/"+iduser+"/rdv",
+	  data: function(){},
+	  success: function(data){
+		var vlistRdv = [];
+		data.data.forEach((elm)=>{
+			  vlistRdv.push(elm)
+		  })  
+	    var destCalendar = new FullCalendar.Calendar(destCalendarEl, {
+            height: '99%',
+			expandRows: true,
+			timeZone: 'Europe/Paris',
+			locale: 'fr',
+			headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'timeGridDay,timeGridWeek,dayGridMonth'
+				  },
+	  		allDayText: 'Comm.',
+		    weekText: 'S',
+			initialDate: new Date(),
+			initialView: 'timeGridWeek',
+			firstDay: 1,
+			editable: true,
+			events: data.data,
+			startParam: "start_date",
+			endParam: "end_date",
+			slotMinTime: '08:00',
+  			slotMaxTime: '18:00',
+			weekNumbers: true,
+			hiddenDays: [ 0 ],
+			dayHeaders:true,
+			buttonText: {
+				  year: "year",
+				  today: "Aujourd'hui",
+				  month: "Mois",
+				  week: "Semaine",
+				  day: "Jour",
+				  list: "Liste",
+				},
+			businessHours: [{
+				// days of week. an array of zero-based day of week integers (0=Sunday)
+				daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+				startTime: '8:00', // a start time (10am in this example)
+				endTime: '12:00', // an end time (6pm in this example)
+			  },
+			  {
+				  // days of week. an array of zero-based day of week integers (0=Sunday)
+				  daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+				  startTime: '13:00', // a start time (10am in this example)
+				  endTime: '18:00', // an end time (6pm in this example)
+				}],
+
+				
+			  droppable: true, // will let it receive events!
+			  eventReceive: function(info) {
+				var myobj = info.event._def.extendedProps;
+				ajaxput(myobj,info,"rdv");
+			    },
+			  eventDrop: function(info) {
+				  var myobj = info.event._def.extendedProps;
+				  ajaxput(myobj,info,"");
+			  },
+			  
+			  eventOverlap: function(stillEvent, movingEvent) {
+				  return stillEvent.allDay && movingEvent.allDay;
+				},
+				
+			  eventAllow: function(dropInfo, draggedEvent) {
+	
+				if(draggedEvent._instance){
+				  var todayd = new Date();
+				  var st = new Date(draggedEvent._instance.range.start);
+				  if(st < todayd)return false;
+				  else return true;
+				}
+				else {
+					console.log("out")
+					return true;
+				}
+				
+
+				  },
+			  eventClick: function(info) {
+				console.log(info.event._def.extendedProps.stick);
+				if(!info.event._def.extendedProps.stick){ 
+				  if (info.event._def.ui.display !== "background") {
+				  	editobjNEW(info.event.extendedProps._id,vlistRdv)
+				  	$('#exampleModalCenter').modal('show')
+				  }
+				}
+				else {
+					console.log(info.event.startStr,
+					info.event._def.title,
+					info.event._def.extendedProps._id)
+					alert(info.event._def.title)
+				    }  	  
+				}
+				  
+			  
+			});
+		destCalendar.render();
+	  }
+	});
+	
+	$.ajax({
+	  dataType: "json",
+	  url: "/restobj/"+iduser2+"/rdv",
+	  data: function(){},
+	  success: function(data){
+		var vlistRdv = [];
+		data.data.forEach((elm)=>{
+			  vlistRdv.push(elm)
+		  })  
+		var destCalendar2 = new FullCalendar.Calendar(srcCalendarEl, {
+			height: '99%',
+			expandRows: true,
+			timeZone: 'Europe/Paris',
+			locale: 'fr',
+			headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'timeGridDay,timeGridWeek,dayGridMonth'
+				  },
+			  allDayText: 'Comm.',
+			weekText: 'S',
+			initialDate: new Date(),
+			initialView: 'timeGridWeek',
+			firstDay: 1,
+			editable: true,
+			events: data.data,
+			startParam: "start_date",
+			endParam: "end_date",
+			slotMinTime: '08:00',
+			  slotMaxTime: '18:00',
+			weekNumbers: true,
+			hiddenDays: [ 0 ],
+			dayHeaders:true,
+			buttonText: {
+				  year: "year",
+				  today: "Aujourd'hui",
+				  month: "Mois",
+				  week: "Semaine",
+				  day: "Jour",
+				  list: "Liste",
+				},
+			businessHours: [{
+				// days of week. an array of zero-based day of week integers (0=Sunday)
+				daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+				startTime: '8:00', // a start time (10am in this example)
+				endTime: '12:00', // an end time (6pm in this example)
+			  },
+			  {
+				  // days of week. an array of zero-based day of week integers (0=Sunday)
+				  daysOfWeek: [ 1, 2, 3, 4,5 ], // Monday - Thursday
+				  startTime: '13:00', // a start time (10am in this example)
+				  endTime: '18:00', // an end time (6pm in this example)
+				}],
+	
+				
+			  droppable: true, // will let it receive events!
+			  eventReceive: function(info) {
+				var myobj = info.event._def.extendedProps;
+				ajaxput(myobj,info,"rdv");
+				},
+			  eventDrop: function(info) {
+				  var myobj = info.event._def.extendedProps;
+				  ajaxput(myobj,info,"");
+			  },
+			  
+			  eventOverlap: function(stillEvent, movingEvent) {
+				  return stillEvent.allDay && movingEvent.allDay;
+				},
+				
+			  eventAllow: function(dropInfo, draggedEvent) {
+	
+				if(draggedEvent._instance){
+				  var todayd = new Date();
+				  var st = new Date(draggedEvent._instance.range.start);
+				  if(st < todayd)return false;
+				  else return true;
+				}
+				else {
+					console.log("out")
+					return true;
+				}
+				
+	
+				  },
+			  eventClick: function(info) {
+				console.log(info.event._def.extendedProps.stick);
+				if(!info.event._def.extendedProps.stick){ 
+				  if (info.event._def.ui.display !== "background") {
+					  editobjNEW(info.event.extendedProps._id,vlistRdv)
+					  $('#exampleModalCenter').modal('show')
+				  }
+				}
+				else {
+					console.log(info.event.startStr,
+					info.event._def.title,
+					info.event._def.extendedProps._id)
+					alert(info.event._def.title)
+					}  	  
+				}
+				  
+			  
+			});
+		destCalendar2.render();
+	  }
+	});
+
+	
+	
+  });
+  
+  function ajaxput(myobj,info,status){
+	var item=JSON.stringify(myobj)  
+	var newob = JSON.parse(item)
+	var dateH=new Date(info.event._instance.range.start);
+	var dstr=dateH.toISOString()
+	
+	newob.dateRdv=dstr;
+	var newHr=dstr.substr(11, 5);
+	newob.heureRDV=newHr;
+	if(status !="")newob.status=status;
+	
+	newob.nomcomhps1="<%=nomcli%>";
+	newob.idcomhps1="<%=iduser%>";
+	
+	newob.nomcomhps2="<%=nomcli2%>";
+	newob.idcomhps2="<%=iduser2%>";
+	 
+	$.ajax({
+		type: 'put',
+		url: "/restobj/<%=iduser%>/"+newob.status+"/"+info.event._def.extendedProps._id,
+		data: JSON.stringify(newob),
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+		console.log(data)
+		}
+	});
+	  
+	
+  }
+
+</script>
+<style>
+
+html {
+	 width: 100%;
+	 height: 100%;
+ }
+body {
+	 width: 100%;
+	 height: 100%;
+	 overflow: hidden;
+	font-size: 14px;
+	font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+  }
+
+  #source-calendar,
+  #destination-calendar {
+	float: left;
+	//height:99%;
+	//width: 99%;
+  }
+
+
+</style>
+</head>
+<body>
+  <div style="width:49%;" id='destination-calendar'></div>	
+  <div style="width:50%;" id='source-calendar'></div>
+  
+
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+		
+		  <form action="/addobj/newhpsrdv" method="POST" id="myform"> 
+			  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalCenterTitle">Nouveau RDV</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+			  <div class="modal-body">
+			   <input type="text" class="d-none" name="_id" id="_id">
+			   
+			   <div class="row">
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Date:</label>
+							  <input type="date"  class="form-control"  id="dateRdv"  required="true">
+							  <input type="text" class="d-none" name="dateRdv" id="dateRdvO">
+							</div>
+					</div>
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Heure:</label>
+							  <input type="time" min="08:00" max="20:00" value="08:00"  class="form-control" name="heureRDV" id="heureRDV" required="true">
+							</div>
+					</div>
+			   </div>
+			 <div class="row">
+				 
+				 <div class="col-2">
+					 <div class="form-group">
+					   <label for="nom">Genre:</label>
+					   <select class="custom-select" required="true" name="source">
+						  <option value="Mr" selected>Mme</option>
+						  <option value="Mme">Mr</option>
+						  <option value="MrMme">Mme / Mr</option>
+						</select>
+					 </div>
+				  </div>
+				 
+				
+
+					 
+				 <div class="col-5">
+					<div class="form-group">
+					  <label for="nom">Nom:</label>
+					  <input type="text" class="form-control" placeholder="Entrer le nom" name="nom" id="nom" required="true">
+					</div>
+				 </div>
+				 <div class="col-5">	 
+				   <div class="form-group">
+					 <label for="pwd">Prenom</label>
+					 <input type="text" class="form-control" placeholder="Entrer le prenom" id="prenom" name="prenom" required="true">
+					</div>
+				 </div>
+			 </div>	 
+			 
+			 <div class="form-group">
+				 <label for="label">Adresse:</label>
+	
+					   <input type="text" class="advancedAutoComplete form-control term" autocomplete="anyrandomstring" placeholder="Entrer l'adresse" name="adresse" id="label" required="true">
+					   <input type="text" class="d-none" name="lat" id="lat">
+					   <input type="text" class="d-none" name="long" id="long">
+					   
+					 <input type="text" class="d-none" name="cp" id="cp">
+					 <input type="text" class="d-none" name="ville" id="ville">
+					 <input type="text" class="d-none" name="num" id="num">
+					 <input type="text" class="d-none" name="rue" id="rue">
+					 
+					 
+					 <input type="text" class="d-none" name="idadr" id="idadr">
+	
+					 <code class="basicAutoSelectSelected"></code>
+					   
+					   
+						<input type="text" class="d-none" name="idtel" id="idtel" value="">
+						<input type="text" class="d-none" name="nomtel" id="nomtel"  value="">
+						<input type="text" class="d-none" name="idcomhps1" id="idcomhps1"  value="">
+						<input type="text" class="d-none" name="nomcomhps1" id="nomcomhps1"  value="">
+						<input type="text" class="d-none" name="idcomhps2" id="idcomhps2"  value="">
+						<input type="text" class="d-none" name="nomcomhps2" id="nomcomhps2"  value="">
+						
+						<input type="text" class="d-none" name="issue" id="issue"  value="">
+						<input type="text" class="d-none" name="origine" id="origine"  value="rdv">
+						<input type="text" class="d-none" name="status" id="status"  value="rdv">
+						<input type="text" class="d-none" name="issuerdv" id="issuerdv"  value="CONFIRME">
+						<input type="text" class="d-none" name="aff" id="aff"  value="2">
+					   
+						 
+				 
+			 </div>
+	  
+	  <div class="row">
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="tel">Telephone:</label>
+				 <input type="number" class="form-control" placeholder="Entrer le telephone" id="tel" name="tel" required="true">
+			 </div>
+		   </div>
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="email">Email address:</label>
+				 <input type="email" class="form-control" placeholder="Entrer l'email" id="email" name="email" >
+			 </div>
+		   </div>
+	  </div>
+	  
+	  <div class="row">
+			 <div class="col-3">
+			   <div class="form-group">
+				   <label for="tel">Age Mr:</label>
+				   <input type="number" class="form-control" placeholder="Entrer age Mr" id="tranchemr" name="tranchemr" >
+			   </div>
+			 </div>
+			 <div class="col-3">
+					<div class="form-group">
+						<label for="tel">Age Mme:</label>
+						<input type="number" class="form-control" placeholder="Entrer age Mme" id="tranchemme" name="tranchemme">
+					</div>
+				  </div>
+				  
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Année const. :</label>
+					   <input type="number" class="form-control" placeholder="Entrer année const." id="anneeConstr" name="anneeConstr" required="true">
+				   </div>
+				 </div>
+				 
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Nb Occupants:</label>
+					   <input type="number" class="form-control" placeholder="Entrer nb occupants" id="nboccupants" name="nboccupants" required="true">
+				   </div>
+				 </div>
+			 
+
+		</div>
+		  
+	  
+			 <div class="form-group">
+				 <label for="comTele">Commentaire:</label>
+				 <textarea class="form-control" placeholder="Entrer le commentaire" id="comTele" name="comTele" rows="4"></textarea>
+			 </div>
+			 
+
+			 
+			 
+	
+		  </div>
+			  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+			  <button type="submit" class="btn btn-primary" >Envoyer</button>
+		  </div>
+		  </form>
+		  
+		</div>
+	  </div>
+	</div>
+	
+<% include bsjs %>	
+	
+	
+</body>
+</html>

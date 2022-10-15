@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<% include head %>
+
+<style>
+	.form-group {
+		font-size: 1.1rem;
+	}
+</style>
+<body>
+
+    <div class="wrapper">
+		
+		<% include navbar %>
+
+        <!-- Page Content  -->
+        <div id="content">
+        
+        <div class="row">
+       	  <div class="col-2">
+		  	<button type="button" class="btn btn-primary newbt mbtnew" data-toggle="modal" data-target="#exampleModalCenter" style="margin-top: 5px;">
+				 Nouveau rdv
+			 </button>
+		  </div>
+          <div class="col-10">
+          <nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="#">Accueil</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Clients</li>
+			</ol>
+		  </nav>
+		  </div>
+		</div>
+		
+		<table data-toggle="table"
+		 	class="table table-condensed table-striped table-sm"
+			
+			<% if(user.type <2){ %> 
+            data-url="/listrdv/0"
+			<% } else {%>
+			data-url="/listrdv/<%=user._id%>"
+			<% } %>
+            data-pagination="true" 
+            data-search="true"
+            data-show-columns="true"
+            data-page-size="16"
+            id= "mtable">
+            
+			<thead>
+				<tr>
+                  
+
+                                <th data-field="_id"    class="d-none" data-formatter="genericFm">_id</th>
+								<th data-field="nomcomhps1" data-sortable="true"	data-valign="middle" data-formatter="genericFm">Commercial 1</th>
+                                <th data-field="nom"    data-valign="middle" data-formatter="genericFm">Nom</th>
+                                <th data-field="prenom"    data-valign="middle" data-formatter="genericFm">Prenom</th>
+                                <th data-field="adresse"   data-valign="middle" data-formatter="genericFm">Adresse</th>
+                                <th data-field="tel" 	data-valign="middle" data-formatter="genericFm">Tel.</th>
+								<th data-field="dateRdv"   data-valign="middle" data-formatter="dateFm">Date rdv</th>
+								<th data-field="heureRDV" 	data-valign="middle" data-formatter="genericFm">Heure</th>
+                                
+                                <th data-field="lat" class="d-none"	data-valign="middle" data-formatter="genericFm" >Tel.</th>
+
+                                <th data-width="120px" data-field="_id"    data-valign="middle" data-formatter="delFm">Action</th>
+				</tr>
+			</thead>
+
+    </table>
+
+		</div>
+		<!-- /Page Content  -->
+		
+		
+    </div>
+    <!-- /wrapper  -->
+    
+    <!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+		<div class="modal-content">
+		
+		  <form action="/addobj/newhpsrdv" method="POST" id="myform" name="myform"> 
+			  <div class="modal-header">
+			<h5 class="modal-title" id="exampleModalCenterTitle">Nouveau RDV</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+			  <div class="modal-body">
+			   <input type="text" class="d-none" name="_id" id="_id">
+			   
+			   <div class="row">
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Date:</label>
+							  <input type="date"  class="form-control"  id="dateRdv"  required="true">
+							  <input type="text" class="d-none" name="dateRdv" id="dateRdvO">
+							</div>
+					</div>
+					<div class="col-6">
+						<div class="form-group">
+							  <label for="nom">Heure:</label>
+							  <input type="time" min="08:00" max="18:00" value="08:00"  class="form-control" name="heureRDV" id="heureRDV" required="true">
+							</div>
+					</div>
+			   </div>
+			 <div class="row">
+				 
+				 <div class="col-2">
+					 <div class="form-group">
+					   <label for="nom">Genre:</label>
+					   <select class="custom-select" required="true" name="source">
+						  <option value="Mr" selected>Mme</option>
+						  <option value="Mme">Mr</option>
+						  <option value="MrMme">Mme / Mr</option>
+						</select>
+					 </div>
+				  </div>
+				 
+				
+
+					 
+				 <div class="col-5">
+					<div class="form-group">
+					  <label for="nom">Nom:</label>
+					  <input type="text" class="form-control" placeholder="Entrer le nom" name="nom" id="nom" required="true">
+					</div>
+				 </div>
+				 <div class="col-5">	 
+				   <div class="form-group">
+					 <label for="pwd">Prenom</label>
+					 <input type="text" class="form-control" placeholder="Entrer le prenom" id="prenom" name="prenom" required="true">
+					</div>
+				 </div>
+			 </div>	 
+			 
+			 <div class="form-group">
+				 <label for="label">Adresse:</label>
+	
+					   <input type="text" class="advancedAutoComplete form-control term" autocomplete="anyrandomstring" placeholder="Entrer l'adresse" name="adresse" id="label" required="true">
+					   <input type="text" class="d-none" name="lat" id="lat">
+					   <input type="text" class="d-none" name="long" id="long">
+					   
+					 <input type="text" class="d-none" name="cp" id="cp">
+					 <input type="text" class="d-none" name="ville" id="ville">
+					 <input type="text" class="d-none" name="num" id="num">
+					 <input type="text" class="d-none" name="rue" id="rue">
+					 
+					 
+					 <input type="text" class="d-none" name="idadr" id="idadr">
+	
+					 <code class="basicAutoSelectSelected"></code>
+					   
+					   
+						<input type="text" class="d-none" name="idtel" id="idtel" value="">
+						<input type="text" class="d-none" name="nomtel" id="nomtel"  value="">
+						<input type="text" class="d-none" name="idcomhps1" id="idcomhps1"  value="">
+						<input type="text" class="d-none" name="nomcomhps1" id="nomcomhps1"  value="">
+						<input type="text" class="d-none" name="idcomhps2" id="idcomhps2"  value="">
+						<input type="text" class="d-none" name="nomcomhps2" id="nomcomhps2"  value="">
+						
+						<input type="text" class="d-none" name="issue" id="issue"  value="">
+						<input type="text" class="d-none" name="origine" id="origine"  value="rdv">
+						<input type="text" class="d-none" name="status" id="status"  value="rdv">
+						<input type="text" class="d-none" name="issuerdv" id="issuerdv"  value="CONFIRME">
+						<input type="text" class="d-none" name="aff" id="aff"  value="2">
+					   
+						 
+				 
+			 </div>
+	  
+	  <div class="row">
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="tel">Telephone:</label>
+				 <input type="number" class="form-control" placeholder="Entrer le telephone" id="tel" name="tel" required="true">
+			 </div>
+		   </div>
+		   <div class="col-6">
+			 <div class="form-group">
+				 <label for="email">Email address:</label>
+				 <input type="email" class="form-control" placeholder="Entrer l'email" id="email" name="email" >
+			 </div>
+		   </div>
+	  </div>
+	  
+	  <div class="row">
+			 <div class="col-3">
+			   <div class="form-group">
+				   <label for="tel">Age Mr:</label>
+				   <input type="number" class="form-control" placeholder="Entrer age Mr" id="tranchemr" name="tranchemr" >
+			   </div>
+			 </div>
+			 <div class="col-3">
+					<div class="form-group">
+						<label for="tel">Age Mme:</label>
+						<input type="number" class="form-control" placeholder="Entrer age Mme" id="tranchemme" name="tranchemme">
+					</div>
+				  </div>
+				  
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Année const. :</label>
+					   <input type="number" class="form-control" placeholder="Entrer année const." id="anneeConstr" name="anneeConstr" required="true">
+				   </div>
+				 </div>
+				 
+			<div class="col-3">
+				   <div class="form-group">
+					   <label for="tel">Nb Occupants:</label>
+					   <input type="number" class="form-control" placeholder="Entrer nb occupants" id="nboccupants" name="nboccupants" required="true">
+				   </div>
+				 </div>
+			 
+
+		</div>
+		  
+	  
+			 <div class="form-group">
+				 <label for="comTele">Commentaire:</label>
+				 <textarea class="form-control" placeholder="Entrer le commentaire" id="comTele" name="comTele" rows="4"></textarea>
+			 </div>
+			 
+
+			 
+			 
+	
+		  </div>
+			  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+			  <button type="submit" class="btn btn-primary" >Envoyer</button>
+		  </div>
+		  </form>
+		  
+		</div>
+	  </div>
+	</div>
+	
+	
+<% include bsjs %>
+	
+<script>
+
+
+	
+
+    function genericFm(value, row, index,field) {
+	    return '<a snd-data-'+row['_id']+'="'+field+'">'+value+'</a>'; 
+    }
+     
+	function dateFm(value, row, index,field) {
+		var today = new Date(value);
+		var dd = String(today.getDate()).padStart(2, '0');
+		var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+		var yyyy = today.getFullYear();
+		
+		today = dd + '/' + mm + '/' + yyyy;
+		
+		return '<a snd-data-'+row['_id']+'="'+field+'">'+today+'</a>';
+	}
+
+    
+   function delFm(value, row) {
+	   lstObj.push(row)
+        //return '<a href="#" id="mdp" data-type="text" data-url="/utilisateurs/del" data-pk="'+row['_id']+'" data-name="_id">Supprimer</a>';
+		var txt = JSON.stringify(row);
+        console.log(row);
+        	return ''+
+        		   '<button type="button" class="btn btn-danger" onclick="'+"confirmdel('"+row['_id']+"');"+'"><i class="fas fa-trash-alt"></i></button>&nbsp;'+
+               	   '<button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-info editbt" onclick="editobjNEW('+"'"+row["_id"]+"'"+')"><i class="fas fa-pencil-alt"></i></button>';
+    	
+        	
+        		}
+    
+
+		
+    $(document).ready(function () {
+
+            $('#rdv').addClass("active");
+
+
+        });
+		
+					
+		// Advanced 1
+		  $('.advancedAutoComplete').autoComplete({
+				resolver: 'custom',
+				events: {
+					search: function (qry, callback) {
+						// let's do a custom ajax call
+						var adr = document.getElementById("label").value;
+						var mdata=[];
+						$.ajax(
+							//'file.json',
+							"https://api-adresse.data.gouv.fr/search/?q="+adr+"&autocomplete=1"
+						).done(function (res) {
+							res.features.forEach(function(item){
+								console.log(item)
+								mdata.push({id: item.properties.id, text: item.properties.label,value : item });
+							})	
+				
+							callback(mdata)
+						});
+					}
+				}
+			});
+
+		  $('.advancedAutoComplete').on('autocomplete.select', function (evt, item) {
+				console.log('select');
+				console.log(item)
+				var lat = item.value.geometry.coordinates[1];
+				var long = item.value.geometry.coordinates[0];
+				$('#lat').val(lat);
+				$('#long').val(long);
+				$('#idadr').val(item.id);
+				$('#num').val(item.value.properties.housenumber);
+				$('#rue').val(item.value.properties.street);
+				$('#cp').val(item.value.properties.postcode);
+				$('#ville').val(item.value.properties.city);
+				
+				$('.basicAutoSelectSelected').html(JSON.stringify(item.value.geometry));
+			});
+
+         
+    </script>
+</body>
+
+</html>
